@@ -23,18 +23,13 @@ public class SpringConnectionManagement implements ConnectionManagement {
     }
 
     public Connection openConnection() throws SQLException {
-        Connection conn = DataSourceUtils.getConnection(this.dataSource);
-        System.out.println(">>>>>>>>连接实例:" + conn);
-        System.out.println(">>>>>>>>连接自动提交? " + conn.getAutoCommit());
-        System.out.println(">>>>>>>>开启transaction " + DataSourceUtils.isConnectionTransactional(conn, this.dataSource));
-        return conn;
+        return DataSourceUtils.getConnection(this.dataSource);
     }
     /**
      * {@inheritDoc}
      */
     @Override
     public void close(Connection connection) throws SQLException {
-        System.out.println(">>>>>>>>关闭:" + connection);
         DataSourceUtils.releaseConnection(connection, this.dataSource);
     }
 

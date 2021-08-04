@@ -21,6 +21,7 @@ import java.util.Set;
  * @author ks015774
  * @since 2021-08-03 11:59:00
  */
+@SuppressWarnings("rawtypes")
 public class ClassPathDaoScanner extends ClassPathBeanDefinitionScanner {
 
     private String dataSourceBeanName;
@@ -30,6 +31,11 @@ public class ClassPathDaoScanner extends ClassPathBeanDefinitionScanner {
     private Class<? extends DaoFactoryBean> daoFactoryBeanClass;
 
     private Class<?> markerInterface;
+
+    public ClassPathDaoScanner(BeanDefinitionRegistry registry) {
+        super(registry, false);
+    }
+
 
     public void setAnnotationClass(Class<? extends Annotation> annotationClass) {
         this.annotationClass = annotationClass;
@@ -45,53 +51,6 @@ public class ClassPathDaoScanner extends ClassPathBeanDefinitionScanner {
 
     public void setMarkerInterface(Class<?> markerInterface) {
         this.markerInterface = markerInterface;
-    }
-
-    public ClassPathDaoScanner(BeanDefinitionRegistry registry) {
-        super(registry);
-    }
-
-    public ClassPathDaoScanner(BeanDefinitionRegistry registry, boolean useDefaultFilters) {
-        super(registry, useDefaultFilters);
-    }
-
-
-    @Override
-    public Set<BeanDefinitionHolder> doScan(String... basePackages) {
-        Set<BeanDefinitionHolder> beanDefinitions = super.doScan(basePackages);
-
-        if (beanDefinitions.isEmpty()) {
-        } else {
-            processBeanDefinitions(beanDefinitions);
-        }
-
-        return beanDefinitions;
-    }
-
-    private void processBeanDefinitions(Set<BeanDefinitionHolder> beanDefinitions) {
-        AbstractBeanDefinition definition;
-        for (BeanDefinitionHolder holder : beanDefinitions) {
-            definition = (AbstractBeanDefinition) holder.getBeanDefinition();
-            if (ScopedProxyFactoryBean.class.getName().equals(definition.getBeanClassName())) {
-                definition = (AbstractBeanDefinition) Optional
-                        .ofNullable(((RootBeanDefinition) definition).getDecoratedDefinition())
-                        .map(BeanDefinitionHolder::getBeanDefinition).orElseThrow(() -> new IllegalStateException(
-                                "The target bean definition of scoped proxy bean not found. Root bean definition[" + holder + "]"));
-            }
-            String beanClassName = definition.getBeanClassName();
-
-            definition.getConstructorArgumentValues().addGenericArgumentValue(beanClassName);
-            definition.setBeanClass(this.daoFactoryBeanClass);
-            if (StringUtils.hasText(this.dataSourceBeanName)) {
-                definition.getPropertyValues().add("dataSource",
-                        new RuntimeBeanReference(this.dataSourceBeanName));
-            }
-
-            definition.getPropertyValues().add("daoFactory",
-                    new RuntimeBeanReference("daoFactory"));
-
-
-        }
     }
 
     public void registerFilters() {
@@ -124,6 +83,43 @@ public class ClassPathDaoScanner extends ClassPathBeanDefinitionScanner {
             String className = metadataReader.getClassMetadata().getClassName();
             return className.endsWith("package-info");
         });
+    }
+
+    @Override
+    public Set<BeanDefinitionHolder> doScan(String... basePackages) {
+        Set<BeanDefinitionHolder> beanDefinitions = super.doScan(basePackages);
+
+        if (!beanDefinitions.isEmpty()) {
+            processBeanDefinitions(beanDefinitions);
+        }
+
+        return beanDefinitions;
+    }
+
+    private void processBeanDefinitions(Set<BeanDefinitionHolder> beanDefinitions) {
+        AbstractBeanDefinition definition;
+        for (BeanDefinitionHolder holder : beanDefinitions) {
+            definition = (AbstractBeanDefinition) holder.getBeanDefinition();
+            if (ScopedProxyFactoryBean.class.getName().equals(definition.getBeanClassName())) {
+                definition = (AbstractBeanDefinition) Optional
+                        .ofNullable(((RootBeanDefinition) definition).getDecoratedDefinition())
+                        .map(BeanDefinitionHolder::getBeanDefinition).orElseThrow(() -> new IllegalStateException(
+                                "The target bean definition of scoped proxy bean not found. Root bean definition[" + holder + "]"));
+            }
+            String beanClassName = definition.getBeanClassName();
+
+            definition.getConstructorArgumentValues().addGenericArgumentValue(beanClassName);
+            definition.setBeanClass(this.daoFactoryBeanClass);
+            if (StringUtils.hasText(this.dataSourceBeanName)) {
+                definition.getPropertyValues().add("dataSource",
+                        new RuntimeBeanReference(this.dataSourceBeanName));
+            }
+
+            definition.getPropertyValues().add("daoFactory",
+                    new RuntimeBeanReference("daoFactory"));
+
+
+        }
     }
 
     @Override

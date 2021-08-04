@@ -5,14 +5,12 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.BeanNameGenerator;
 import org.springframework.context.ResourceLoaderAware;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
-import uia.dao.DaoFactory;
 import uia.dao.spring.dao.DaoScannerConfigurer;
 
 import java.lang.annotation.Annotation;
@@ -24,13 +22,11 @@ import java.util.stream.Collectors;
 
 public class DaoScannerRegistrar  implements ImportBeanDefinitionRegistrar, ResourceLoaderAware {
 
-    private ResourceLoader resourceLoader;
-
 
     @Override
     @Deprecated
     public void setResourceLoader(ResourceLoader resourceLoader) {
-        this.resourceLoader = resourceLoader;
+      // NOP
     }
 
     @Override
@@ -80,15 +76,7 @@ public class DaoScannerRegistrar  implements ImportBeanDefinitionRegistrar, Reso
 
         builder.addPropertyValue("basePackage", StringUtils.collectionToCommaDelimitedString(basePackages));
 
-
         registry.registerBeanDefinition(beanName, builder.getBeanDefinition());
-
-/*        DaoBeanDefinitionScanner scanner = new DaoBeanDefinitionScanner(registry, false);
-        scanner.setResourceLoader(resourceLoader);
-
-        scanner.addIncludeFilter(new AnnotationTypeFilter(DaoInfo.class));
-        //测试直接写死，可改成要scan的目录
-        scanner.doScan(basePackages.toArray(new String[0]));*/
 
     }
 

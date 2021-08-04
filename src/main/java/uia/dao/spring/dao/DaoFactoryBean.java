@@ -11,9 +11,7 @@ public class DaoFactoryBean<T extends TableDao<?>> implements FactoryBean<T> {
 
     private Class<T> daoClass;
 
-
     private DataSource dataSource;
-
 
     private DaoFactory daoFactory;
 

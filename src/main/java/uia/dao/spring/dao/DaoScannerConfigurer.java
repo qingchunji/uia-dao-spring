@@ -29,10 +29,9 @@ import static org.springframework.util.Assert.notNull;
  * @author ks015774
  * @since 2021-08-03 11:49:00
  */
+@SuppressWarnings("rawtypes")
 public class DaoScannerConfigurer
         implements BeanDefinitionRegistryPostProcessor, InitializingBean, ApplicationContextAware, BeanNameAware {
-
-    private boolean addToConfig = true;
 
     private String beanName;
 
@@ -48,15 +47,10 @@ public class DaoScannerConfigurer
 
     private BeanNameGenerator nameGenerator;
 
-
     private String dataSourceBeanName;
 
     public void setBasePackage(String basePackage) {
         this.basePackage = basePackage;
-    }
-
-    public void setAddToConfig(boolean addToConfig) {
-        this.addToConfig = addToConfig;
     }
 
     public void setAnnotationClass(Class<? extends Annotation> annotationClass) {
@@ -100,7 +94,6 @@ public class DaoScannerConfigurer
         }
 
         ClassPathDaoScanner scanner = new ClassPathDaoScanner(registry);
-        //scanner.setAddToConfig(this.addToConfig);
         scanner.setAnnotationClass(this.annotationClass);
         scanner.setMarkerInterface(null);
         scanner.setDataSourceBeanName(this.dataSourceBeanName);
@@ -134,18 +127,10 @@ public class DaoScannerConfigurer
 
             this.basePackage = updatePropertyValue("basePackage", values);
             this.dataSourceBeanName = updatePropertyValue("dataSourceBeanName", values);
-/*            this.sqlSessionFactoryBeanName = updatePropertyValue("sqlSessionFactoryBeanName", values);
-            this.sqlSessionTemplateBeanName = updatePropertyValue("sqlSessionTemplateBeanName", values);
-            this.lazyInitialization = updatePropertyValue("lazyInitialization", values);*/
         }
         this.basePackage = Optional.ofNullable(this.basePackage).map(getEnvironment()::resolvePlaceholders).orElse(null);
         this.dataSourceBeanName = Optional.ofNullable(this.dataSourceBeanName).map(getEnvironment()::resolvePlaceholders).orElse(null);
-/*        this.sqlSessionFactoryBeanName = Optional.ofNullable(this.sqlSessionFactoryBeanName)
-                .map(getEnvironment()::resolvePlaceholders).orElse(null);
-        this.sqlSessionTemplateBeanName = Optional.ofNullable(this.sqlSessionTemplateBeanName)
-                .map(getEnvironment()::resolvePlaceholders).orElse(null);
-        this.lazyInitialization = Optional.ofNullable(this.lazyInitialization).map(getEnvironment()::resolvePlaceholders)
-                .orElse(null);*/
+
     }
 
     private Environment getEnvironment() {

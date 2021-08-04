@@ -1,7 +1,7 @@
 # uia dao spring
 Spring integration for uia.dao
 
-##Installation and Getting Started
+## Installation and Getting Started
 1.使用spring boot initializr初始化工程(不需要勾选任何依赖)
 
 2.加入依赖

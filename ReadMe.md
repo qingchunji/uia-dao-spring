@@ -39,9 +39,9 @@ Spring integration for uia.dao
     @Primary
     public DataSource dataSource() throws SQLException {
         DruidDataSource druidDataSource = new DruidDataSource();
-        druidDataSource.setUsername("WIP");
-        druidDataSource.setPassword("Sap12345");
-        druidDataSource.setUrl("jdbc:sap://10.160.2.23:31041?reconnect=true");
+        druidDataSource.setUsername("*******");
+        druidDataSource.setPassword("*******");
+        druidDataSource.setUrl("jdbc:XXXXXXXX");
         // druidDataSource.setFilters("stat,wall");
         druidDataSource.setFilters("stat");
         druidDataSource.setInitialSize(1);
